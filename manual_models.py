@@ -57,25 +57,36 @@ def implement_W2(interval):
 
 def test(model, T , L, has_BOS = True, verbose=False):
     works = True
-    for k in range(1,L+1):
-        if has_BOS:
-            x = [T] + [np.random.randint(1,T)] * k + (L-k) * [0]
-        else:
-            x = [np.random.randint(1,T)] * k + (L-k) * [0]
-        x = torch.tensor(x ).to(device).reshape(1,-1)
-        r = model(x)
-        if has_BOS:
-            x_hat = r[0,1].argmax().item()
-        else:
-            x_hat = r[0,0].argmax().item()
-        if x_hat != k:
-            if verbose:
-                print(f"I got {x_hat}, but should have been {k}.")
-            works = False
+    res = []
+    samples = 50000
+    for i in range(samples):
+        for k in range(1,L+1):
+            
+            a = np.random.randint(1,T)
+            b = np.random.randint(1,T-1)
+            if a == b:
+                b = T-1
+            if has_BOS:
+                x = [T] + [a] * k + (L-k) * [b]
+            else:
+                x = [a] * k + (L-k) * [b]
+            x = torch.tensor(x ).to(device).reshape(1,-1)
+            r = model(x)
+            if has_BOS:
+                x_hat = r[0,1].argmax().item()
+            else:
+                x_hat = r[0,0].argmax().item()
+            if x_hat != k:
+                if verbose:
+                    print(model.b)
+                    print(f"I got {x_hat}, but should have been {k}.")
+                works = False
+    print(50000, ' samples tested.')
     if works:
         print("Test passed, model works!")
     else:
         print(":((( Test failed, model does not work!")
+
 
 def generate_perfect_weights(config):
     if config['attention_input'] == 'only_sem' and config['no_softmax'] == False and config['dataset_type'] == 'backward':
