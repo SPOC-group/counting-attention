@@ -1,8 +1,8 @@
-# Code "Understanding Counting in Small Transformers: The Interplay between Attention and Feed-Forward Layers"
+# Code
 
 This repository contains the code that is able to reproduce the results and figures for: 
 
-> Understanding Counting in Small Transformers: The Interplay between Attention and Feed-Forward Layers, 
+> Counting in Small Transformers: The Delicate Interplay between Attention and Feed-Forward Layers, 
 > by Freya Behrens, Luca Biggio, Lenka Zdeborová
 
 ## Reproducing Figures
@@ -27,6 +27,8 @@ Running all experiments takes approximately 1 week on a single GPU (NVIDIA RTX A
 ## Explicit Constructions
 
 In ```[theory]-explicit-constructions-d=T.ipynb``` and its dependencies we implemented the algorithms from out explicit constructions for $d=T$.
+In ```[theory]-explicit-constructions-d<T-mutual-coherence.ipynb``` and its dependencies we implemented the algorithms from out explicit constructions for $d<T$ that rely on ideas connected to the mutual coherence bounds.
+In ```[theory]-explicit-constructions-d<T-softmax.ipynb``` and its dependencies we implemented the algorithms from out explicit constructions for $d<T$ that rely on ideas connected to the softmax.
 
 ## Software requirements
 
