@@ -262,13 +262,22 @@ class TransformerSeq2Seq(nn.Module):
     
     if self.attention_input  == 'linear':
       self.token_mixer = LinearMixer(model_dim,L)
+      self.token_mixer2 = LinearMixer(model_dim,L)
     else:
       self.token_mixer = DotPMixer(model_dim,L,attention_input=attention_input)
+      self.token_mixer2 = DotPMixer(model_dim,L,attention_input=attention_input)
+      
+      
     
     #self.norm = nn.LayerNorm(model_dim)
     self.fc1 = nn.Linear(model_dim, p)
     self.activ = nn.ReLU()
-    self.fc2 = nn.Linear(p, n_classes)
+    self.fc2 = nn.Linear(p, model_dim)
+    
+    self.fc3 = nn.Linear(model_dim, p)
+    self.fc4 = nn.Linear(p, n_classes)
+    
+    
 
   def forward(self,x, is_embedded=False): # B x L
     if is_embedded:
@@ -281,13 +290,15 @@ class TransformerSeq2Seq(nn.Module):
       attn_scores = self.token_mixer(x_sem,x_pos) # B x L x L 
     else:
        attn_scores = self.token_mixer(x_sem,None) # B x L x L 
+       
     self.attn_scores = attn_scores
+    
     if self.use_softmax:
       attn_probs = torch.softmax(attn_scores,dim=-1)
     else:
       attn_probs = attn_scores
+      
     self.attn_probs = attn_probs
-    
     a = torch.matmul(attn_probs,x_sem)
     self.a = a
     if self.attention_input == 'both' and not is_embedded:
@@ -301,6 +312,36 @@ class TransformerSeq2Seq(nn.Module):
     self.x = x
     self.b = self.fc1(x)
     x = self.fc2(self.activ(self.b))
+    
+    if self.attention_input == 'both' or self.attention_input == 'only_pos':
+      x_pos = self.positional_emb(x)
+      attn_scores = self.token_mixer2(x_sem,x_pos) # B x L x L 
+    else:
+       attn_scores = self.token_mixer2(x_sem,None) # B x L x L 
+       
+    self.attn_scores = attn_scores
+    
+    if self.use_softmax:
+      attn_probs = torch.softmax(attn_scores,dim=-1)
+    else:
+      attn_probs = attn_scores
+      
+    self.attn_probs = attn_probs
+    a = torch.matmul(attn_probs,x_sem)
+    self.a = a
+    if self.attention_input == 'both' and not is_embedded:
+      x = a + x_sem + x_pos
+    elif self.attention_input == 'only_sem':
+      x = a + x_sem
+    elif self.attention_input == 'only_pos':
+      x = a + x_sem
+    else:
+      x = a + x_sem
+    self.x = x
+    self.b = self.fc3(x)
+    x = self.fc4(self.activ(self.b))
+    
+    
     return x
   
   def get_output(self,a,x_sem):

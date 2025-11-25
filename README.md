@@ -22,7 +22,7 @@ The notebooks are named according to the figure number in the paper, which shoul
 
 The results were generated from scripts, that can be generated from ```[experiments]-scripts.ipynb```.
 These should be configured with your personal wandb id. 
-Running all experiments takes approximately 1 week on a single GPU (NVIDIA RTX A5000).
+Running all experiments takes approximately 2 weeks on a single GPU (NVIDIA RTX A5000).
 
 ## Explicit Constructions
 
